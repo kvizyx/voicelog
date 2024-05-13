@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "$HTTP_PORT:$HTTP_PORT"
+
+  minio:
+    image: quay.io/minio/minio
+    command: minio server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=kvizyx
+      - MINIO_ROOT_PASSWORD=kvizyx
+    restart: always
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000" # storage
+      - "9001:9001" # web-ui
+
+volumes:
+  minio_data:
