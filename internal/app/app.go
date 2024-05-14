@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/kvizyx/voicelog/internal/bot"
 	"github.com/kvizyx/voicelog/internal/config"
@@ -60,8 +59,6 @@ func (a *App) Start(ctx context.Context) error {
 
 		return nil
 	})
-
-	a.Logger.Info("service started", slog.Any("env", a.Config.Env))
 
 	return group.Wait()
 }

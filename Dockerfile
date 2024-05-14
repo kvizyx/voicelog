@@ -1,5 +1,7 @@
 FROM golang:1.22-alpine as builder
 
+RUN apk update && apk add --no-cache ca-certificates && update-ca-certificates
+
 ENV USER=appuser
 ENV UID=10001
 
@@ -12,7 +14,7 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 
-WORKDIR src/app/
+WORKDIR /app
 
 COPY go.mod .
 COPY go.sum .
@@ -23,19 +25,24 @@ COPY cmd cmd
 COPY internal internal
 COPY pkg pkg
 COPY .env .env
-COPY .storage .storage
+COPY .tmp .tmp
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/server cmd/server/main.go
 
-FROM scratch
+FROM alpine:latest
 
+WORKDIR /go/bin
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
 COPY --from=builder /go/bin/server /go/bin/server
+COPY --from=builder /app/.env .env
+COPY --from=builder /app/.tmp .tmp
 
-WORKDIR /go/bin
+RUN chown appuser:appuser .tmp
 
 USER appuser:appuser
 
-ENTRYPOINT ["/go/bin/server"]
+ENTRYPOINT ["./server", "--config", "../../.env"]

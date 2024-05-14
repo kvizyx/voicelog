@@ -102,7 +102,7 @@ func (s *Session) onStart(ctx context.Context) error {
 		return fmt.Errorf("failed to send speaking packet: %w", err)
 	}
 
-	recordPath := fmt.Sprintf(".storage/channel%d.ogg", s.channelID)
+	recordPath := fmt.Sprintf(".tmp/channel%d.ogg", s.channelID)
 
 	recordWriter, err := oggwriter.New(recordPath, 48000, 2)
 	if err != nil {
@@ -117,7 +117,7 @@ func (s *Session) onStart(ctx context.Context) error {
 }
 
 func (s *Session) onStop(ctx context.Context) error {
-	recordPath := fmt.Sprintf(".storage/channel%d.ogg", s.channelID)
+	recordPath := fmt.Sprintf(".tmp/channel%d.ogg", s.channelID)
 
 	defer func() {
 		s.voiceManager.Close(ctx)

@@ -4,21 +4,31 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    depends_on:
+      - minio
     ports:
       - "$HTTP_PORT:$HTTP_PORT"
+    networks:
+      - voicelog
 
   minio:
     image: quay.io/minio/minio
-    command: minio server /data --console-address ":9001"
+    command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=kvizyx
-      - MINIO_ROOT_PASSWORD=kvizyx
+      - MINIO_ROOT_PASSWORD=kvizyxpass
     restart: always
     volumes:
       - minio_data:/data
     ports:
       - "9000:9000" # storage
       - "9001:9001" # web-ui
+    networks:
+      - voicelog
+
+networks:
+  voicelog:
+    driver: bridge
 
 volumes:
   minio_data:

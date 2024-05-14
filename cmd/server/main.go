@@ -30,7 +30,8 @@ func main() {
 	}
 
 	logger := loglib.MustNew(loglib.Params{
-		Env:        cfg.Env,
+		Env: cfg.Env,
+
 		LevelLocal: slog.LevelDebug,
 		LevelProd:  slog.LevelInfo,
 	})
